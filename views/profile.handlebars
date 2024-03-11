@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | CareTakerPortal</title>
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css'/>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<body>
+<nav>
+    <h4>Caretaker Portal</h4>
+    <ul>
+        <li><a href='/logout'>Logout</a></li>
+    </ul>
+</nav>
+<div class="body_section">
+    <div class="profile">
+        <div class="image">
+            <img src="./images/logo.jpg" width="120" height="120" alt="profile_picture"/>
+        </div>
+        <div class="details patientInfo">
+            <div class="item">
+                <label>Name</label>
+                <div class="value">{{careTaker.first_name}} {{careTaker.last_name}}</div>
+                {{#if careTaker.admin}}
+                    <div class="value">Administrator</div>
+                {{/if}}
+            </div>
+            <div class="item">
+                <label>Email</label>
+                <div class="value">{{careTaker.email}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="summary">
+        <div id="care_team">
+            <div class="section_label">Your Patients</div>
+            <table>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Caretaker</th>
+                    <th>Email</th>
+                    <th>profile</th>
+                </tr>
+                </thead>
+                <tbody class="careteamInfo">
+                {{#each patients}}
+                    <tr>
+                        <td>{{first_name}} {{last_name}}</td>
+                        <td>{{caretaker_first_name}} {{caretaker_last_name}}</td>
+                        <td>{{email}}</td>
+                        <td><a href='/patient?id={{id}}'>view</a></td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
