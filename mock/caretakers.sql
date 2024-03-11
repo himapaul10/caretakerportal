@@ -1,0 +1,1 @@
+INSERT INTO careportal.caretakers (id, first_name, last_name, email, password, admin, created_at, updated_at) VALUES ('2e6dc370-5173-440f-ac61-f0593945aaa8', 'Massimo', 'Albanese', 'm', '$2b$10$o/GXEzZtdSr11LIrmPRb4O.LKslxNKMzbxFbl5tO36rO96.bpfPx2', 1, '2024-02-12 18:59:53', '2024-02-12 18:59:53');

@@ -1,0 +1,105 @@
+###
+GET http://0.0.0.0:8081/api/test/b6673aee-c9d8-11ee-8491-029e9cf81533
+
+###
+GET http://0.0.0.0:8081/api/search_medications/advil
+
+###
+GET http://0.0.0.0:8081/api/search_medications/aspirin
+
+
+###
+GET http://0.0.0.0:8081/api/search_medications/0573-1769
+
+###
+GET http://0.0.0.0:8081/api/search_medications/0573-1769a
+
+###
+GET http://0.0.0.0:8081/api/get_medication/f70a8d20-570c-1e94-e053-6294a90ab66f
+
+###
+GET http://0.0.0.0:8081/api/get_medication/a
+
+###
+GET http://0.0.0.0:8081/api/schedule/b6673aee-c9d8-11ee-8491-029e9cf81533
+
+###
+POST http://0.0.0.0:8081/api/medication
+Content-Type: application/json
+
+{
+  "patient_id": "b6673aee-c9d8-11ee-8491-029e9cf81533",
+  "cabinet_id": "b45569c2-c9d9-11ee-8491-029e9cf81533",
+  "medications": [
+    {
+      "medication_id": "f70a8d20-570c-1e94-e053-6294a90ab66f",
+      "box": 0,
+      "quantity": 100
+    },
+    {
+      "medication_id": "f70a8d20-570c-1e94-e053-6294a90ab66f",
+      "box": 1,
+      "quantity": 2
+    },
+    {
+      "medication_id": "12c38d55-27d3-4060-8563-42aafa17d586",
+      "box": 7,
+      "quantity": 39
+    }
+  ]
+}
+
+###
+POST http://0.0.0.0:8081/api/schedule
+Content-Type: application/json
+
+{
+  "patient_id": "b6673aee-c9d8-11ee-8491-029e9cf81533",
+  "cabinet_id": "b45569c2-c9d9-11ee-8491-029e9cf81533",
+  "medications": [
+    {
+      "medication_id": "f70a8d20-570c-1e94-e053-6294a90ab66f",
+      "day": 1,
+      "time": "11:30"
+    },
+    {
+      "medication_id": "f70a8d20-570c-1e94-e053-6294a90ab66f",
+      "day": 1,
+      "time": "16:30"
+    },
+    {
+      "medication_id": "12c38d55-27d3-4060-8563-42aafa17d586",
+      "day": 4,
+      "time": "11:30"
+    }
+  ]
+}
+
+###
+POST http://0.0.0.0:8081/api/session
+Content-Type: application/json
+
+{
+  "patient_id": "b6673aee-c9d8-11ee-8491-029e9cf81533",
+  "cabinet_id": "b45569c2-c9d9-11ee-8491-029e9cf81533",
+  "alarm_time": "2023-05-24 05:45:00",
+  "start_time": "2023-05-24 05:50:00",
+  "end_time": "2023-05-24 05:50:50",
+  "session_intakes": [
+    {
+      "medication_id": "f70a8d20-570c-1e94-e053-6294a90ab66f",
+      "start_time": "2023-05-24 05:50:00",
+      "end_time": "2023-05-24 05:50:10",
+      "ingested": true
+    },
+    {
+      "medication_id": "12c38d55-27d3-4060-8563-42aafa17d586",
+      "start_time": "2023-05-24 05:50:10",
+      "end_time": "2023-05-24 05:50:20",
+      "ingested": true
+    }
+  ]
+}
+
+
+
