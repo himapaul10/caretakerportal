@@ -3,10 +3,10 @@ require("./constants");
 
 const sequelize = new Sequelize({
     dialect: 'mysql',
-    host: 'caretaker-portal.c5888ae8yqbj.us-east-1.rds.amazonaws.com',
-    username: 'admin',
-    password: 'AnikaAWS123',
-    database: 'careportal',
+    host: process.env.HOST,
+    username: process.env.LOGIN,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE,
     logging: false
 });
 
