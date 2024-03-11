@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Caretaker Portal</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css' />
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<body>
+    <nav>
+        <h4>Caretaker Portal</h4>
+        <ul>
+            <li><a href='/logout'>Logout</a></li>
+        </ul>
+    </nav>
+    <div class="body_section">
+        <div class="profile">
+            <div class="image">
+                <img src="./images/logo.jpg" width="120" height="120" alt="profile_picture" />
+                </div>
+                <div class="details patientInfo">
+                    <div class="item">
+                        <label>Patient Name:</label>
+                        <div class="value">{{patient.first_name}} {{patient.last_name}}</div>
+                    </div>
+                    <div class="item">
+                        <label>Date Of Birth</label>
+                        <div class="value">{{formatDate patient.dob}}</div>
+                    </div>
+                <div class="item">
+                    <label>Phone</label>
+                    <div class="value">{{patient.phone}}</div>
+                </div>
+                <div class="item">
+                    <label>Email</label>
+                    <div class="value">{{patient.email}}</div>
+                </div>
+                </div>
+                </div>
+                <div class="menu">
+                    <div class="menu_option" id="option_1">Summary</div>
+                    <div class="menu_option" id="option_2">Care Team</div>
+                    <div class="menu_option" id="option_3">Medications</div>
+                    <div class="menu_option" id="option_4">Medication Schedule</div>
+                    <div class="menu_option" id="option_5">Analytics</div>
+            </div>
+            <div class="summary">
+                <div id="care_team">
+                    <div class="section_label">Caretaker</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Caretaker</th>
+                                <th>Email</th>
+                                <th>profile</th>
+                            </tr>
+                        </thead>
+                        <tbody class="careteamInfo">
+                            <tr>
+                                <td>{{careTaker.first_name}} {{careTaker.last_name}}</td>
+                                <td>{{careTaker.email}}</td>
+                                <td><a href="/profile/{{careTaker.id}}">view</a></td>
+                            </tr>
+                        </tbody>
+                        </table>
+                        </div>
+            <div id="medications">
+                <div class="section_label">Medications</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>NDC</th>
+                            <th>Box</th>
+                            <th>Quantity</th>
+                            <th>Brand Name</th>
+                            <th>Generic Name</th>
+                        </tr>
+                        </thead>
+                        <tbody class="medicationInfo">
+                            {{#each medicationData}}
+                            <tr>
+                            <td>{{this.ndc}}</td>
+                            <td>{{this.box}}</td>
+                            <td>{{this.quantity}}</td>
+                            <td>{{this.brand_name}}</td>
+                            <td>{{this.generic_name}}</td>
+                            </tr>
+                            {{/each}}
+
+                    </tbody>
+                    </table>
+                    </div>
+                    <div id="schedule">
+                        <div class="section_label">Medication Schedule</div>
+                <div class="tabsList_days">
+                    <div class="tab" id="day_0">Sunday</div>
+                    <div class="tab" id="day_1">Monday</div>
+                    <div class="tab" id="day_2">Tuesday</div>
+                    <div class="tab" id="day_3">Wednesday</div>
+                    <div class="tab" id="day_4">Thursday</div>
+                    <div class="tab" id="day_5">Friday</div>
+                    <div class="tab" id="day_6">Saturday</div>
+                </div>
+                <div class="">
+                    <table id="myTable">
+                        <thead>
+                            <tr>
+                                <th>Brand Name</th>
+                                <th>Generic Name</th>
+                                <th>Time to Take</th>
+                                <th>Day</th>
+                                <th>Taken Today</th>
+                                </tr>
+                                </thead>
+                        
+                        <tbody class="schedule_div" id="day_0_schedules">
+                            {{#each schedules}}
+                            {{#ifEquals this.day '0'}}
+                            <tr>
+                                <td>{{this.Medication.brand_name}}</td>
+                                <td>{{this.Medication.generic_name}}</td>
+                                <td>{{this.time}}</td>
+                                <td>{{this.day}}</td>
+                                <td>{{#if this.ingested}} Yes {{else}} No {{/if}}</td>
+                                </tr>
+                            {{/ifEquals}}
+                            {{/each}}
+                            </tbody>
+                            <tbody class="schedule_div" id="day_1_schedules">
+                                {{#each schedules}}
+                                {{#ifEquals this.day '1'}}
+                                <tr>
+                                <td>{{this.Medication.brand_name}}</td>
+                                <td>{{this.Medication.generic_name}}</td>
+                                <td>{{this.time}}</td>
+                                <td>{{this.day}}</td>
+                                <td>{{#if this.ingested}} Yes {{else}} No {{/if}}</td>
+                                </tr>
+                            {{/ifEquals}}
+                            {{/each}}
+                            </tbody>
+                            <tbody class="schedule_div" id="day_2_schedules">
+                                {{#each schedules}}
+                                {{#ifEquals this.day '2'}}
+                            <tr>
+                                <td>{{this.Medication.brand_name}}</td>
+                                <td>{{this.Medication.generic_name}}</td>
+                                <td>{{this.time}}</td>
+                                <td>{{this.day}}</td>
+                                <td>{{#if this.ingested}} Yes {{else}} No {{/if}}</td>
+                                </tr>
+                            {{/ifEquals}}
+                            {{/each}}
+                            </tbody>
+                            <tbody class="schedule_div" id="day_3_schedules">
+                                {{#each schedules}}
+                                {{#ifEquals this.day '3'}}
+                            <tr>
+                                <td>{{this.Medication.brand_name}}</td>
+                                <td>{{this.Medication.generic_name}}</td>
+                                <td>{{this.time}}</td>
+                                <td>{{this.day}}</td>
+                                <td>{{#if this.ingested}} Yes {{else}} No {{/if}}</td>
+                                </tr>
+                            {{/ifEquals}}
+                            {{/each}}
+                            </tbody>
+                            <tbody class="schedule_div" id="day_4_schedules">
+                                {{#each schedules}}
+                                {{#ifEquals this.day '4'}}
+                            <tr>
+                                <td>{{this.Medication.brand_name}}</td>
+                                <td>{{this.Medication.generic_name}}</td>
+                                <td>{{this.time}}</td>
+                                <td>{{this.day}}</td>
+                                <td>{{#if this.ingested}} Yes {{else}} No {{/if}}</td>
+                                </tr>
+                            {{/ifEquals}}
+                            {{/each}}
+                            </tbody>
+                            <tbody class="schedule_div" id="day_5_schedules">
+                                {{#each schedules}}
+                                {{#ifEquals this.day '5'}}
+                            <tr>
+                                <td>{{this.Medication.brand_name}}</td>
+                                <td>{{this.Medication.generic_name}}</td>
+                                <td>{{this.time}}</td>
+                                <td>{{this.day}}</td>
+                                <td>
+                                    {{#if this.ingested}} Yes {{else}} No {{/if}}
+                                </td>
+                                </tr>
+                            {{/ifEquals}}
+                            {{/each}}
+                            </tbody>
+                            <tbody class="schedule_div" id="day_6_schedules">
+                                {{#each schedules}}
+                                {{#ifEquals this.day '6'}}
+                            <tr>
+                                <td>{{this.Medication.brand_name}}</td>
+                                <td>{{this.Medication.generic_name}}</td>
+                                <td>{{this.time}}</td>
+                                <td>{{this.day}}</td>
+                                <td>{{#if this.ingested}} Yes {{else}} No {{/if}}</td>
+                                </tr>
+                            {{/ifEquals}}
+                            {{/each}}
+                            </tbody>
+                    </table>
+                    </div>
+                    </div>
+                    
+                    <div id="analytics">
+                        <div class="section_label">Analytics</div>
+                        <div id="chart1" style="margin:20px 0 60px 0;"></div>
+                        <div id="chart2" style="margin: 60px 0 60px 0;"></div>
+                        <div id="chart3" style="margin: 60px 0 0 0;"></div>
+                    </div>
+                    </div>
+                    </div>
+</body>
+
+<script>
+    $(document).ready(function () {
+        
+        function handleData() {
+            
+            $('#day_0').css("background-color", "#555");
+            $('#day_1').css("background-color", "#555");
+            $('#day_2').css("background-color", "#555");
+            $('#day_3').css("background-color", "#555");
+            $('#day_4').css("background-color", "#555");
+            $('#day_5').css("background-color", "#555");
+            $('#day_6').css("background-color", "#555");
+
+            $(`.schedule_div`).hide();
+            
+        }
+        $(`.schedule_div`).hide();
+        $('#day_1_schedules').show();
+        $('#day_1').css("background-color", "blue");
+        $('#day_0').click(function () {
+            handleData();
+            $('#day_0_schedules').show();
+            $('#day_0').css("background-color", "blue");
+        })
+        $('#day_1').click(function () {
+            handleData();
+            $('#day_1_schedules').show();
+            $('#day_1').css("background-color", "blue");
+        })
+        $('#day_2').click(function () {
+            handleData();
+            $('#day_2_schedules').show();
+            $('#day_2').css("background-color", "blue");
+        })
+        $('#day_3').click(function () {
+            handleData();
+            $('#day_3_schedules').show();
+            $('#day_3').css("background-color", "blue");
+        })
+        $('#day_4').click(function () {
+            handleData();
+            $('#day_4_schedules').show();
+            $('#day_4').css("background-color", "blue");
+        })
+        $('#day_5').click(function () {
+            handleData();
+            $('#day_5_schedules').show();
+            $('#day_5').css("background-color", "blue");
+        })
+        $('#day_6').click(function () {
+            handleData();
+            $('#day_6_schedules').show();
+            $('#day_6').css("background-color", "blue");
+        })
+        $('#all_schedules').click(function () {
+            handleData();
+            $('#all_day_schedules').show();
+            $('#all_schedules').css("background-color", "blue");
+        })
+
+        $("#option_1").css("background-color", "rgb(5, 5, 40)");
+        function makeUp() {
+            $("#option_1").css("background-color", "rgb(95, 95, 247)");
+            $("#option_2").css("background-color", "rgb(95, 95, 247)");
+            $("#option_3").css("background-color", "rgb(95, 95, 247)");
+            $("#option_4").css("background-color", "rgb(95, 95, 247)");
+            $("#option_5").css("background-color", "rgb(95, 95, 247)");
+
+            $("#care_team").hide();
+            $("#medications").hide();
+            $("#schedule").hide();
+            $("#analytics").hide();
+        }
+
+        $("#option_1").click(function () {
+            makeUp();
+            $("#option_1").css("background-color", "rgb(5, 5, 40)");
+
+            $("#care_team").show();
+            $("#medications").show();
+            $("schedule").show();
+            $("#analytics").show();
+        });
+
+        $("#option_2").click(function () {
+            makeUp();
+            $("#option_2").css("background-color", "rgb(5, 5, 40)");
+            $("#care_team").show();
+        });
+
+        $("#option_3").click(function () {
+            makeUp();
+            $("#option_3").css("background-color", "rgb(5, 5, 40)");
+            $("#medications").show();
+        });
+
+        $("#option_4").click(function () {
+            makeUp();
+            $("#option_4").css("background-color", "rgb(5, 5, 40)");
+            $("#schedule").show();
+        });
+
+        $("#option_5").click(function () {
+            makeUp();
+            $("#option_5").css("background-color", "rgb(5, 5, 40)");
+            $("#analytics").show();
+        });
+    });
+
+
+    Highcharts.chart('chart1', {
+        chart: {
+            type: 'line',
+        },
+        title: {
+            text: "Ingestion time per medication",
+        },
+        legend: {
+            enabled: false,
+        },
+        credits: {
+            enabled: false,
+        },
+
+        subtitle: {
+            text: null,
+            align: 'left'
+        },
+
+        yAxis: {
+            title: {
+                text: 'Ingestion time per medication (in seconds)'
+            }
+        },
+
+        xAxis: {
+            title: {
+                text: null
+            },
+            type: 'category'
+        },
+
+        series: [
+            {
+                name: 'Medicines',
+                colorByPoint: true,
+                data: {{{ ingestionChartData }}}
+            }
+        ]
+    });
+    Highcharts.chart('chart2', {
+        chart: {
+            type: 'pie',
+        },
+        title: {
+            text: "Alarm response time",
+        },
+        legend: {
+            enabled: false,
+        },
+        credits: {
+            enabled: false,
+        },
+
+        subtitle: {
+            text: null,
+            align: 'left'
+        },
+
+        yAxis: {
+            title: {
+                text: 'Ingestion time per medication (in minutes)'
+            }
+        },
+
+        xAxis: {
+            title: {
+                text: null
+            },
+            type: 'category'
+        },
+        accessibility: {
+            announceNewData: {
+                enabled: true
+            }
+        },
+        plotOptions: {
+            series: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: [{
+                    enabled: true,
+                    distance: 20
+                }, {
+                    enabled: true,
+                    distance: -40,
+                    format: '{point.y:.1f} sec',
+                    style: {
+                        textOutline: 'none',
+                    },
+                }]
+            }
+        },
+
+        series: [
+            {
+                name: 'Medicines',
+                colorByPoint: true,
+                data: {{{ sessionDetails }}}
+            }
+        ]
+    });
+    Highcharts.chart('chart3', {
+        chart: {
+            type: 'column',
+        },
+        title: {
+            text: "Medication ingestion failure rate over a Week",
+        },
+        legend: {
+            enabled: false,
+        },
+        credits: {
+            enabled: false,
+        },
+
+        subtitle: {
+            text: null,
+            align: 'left'
+        },
+
+        yAxis: {
+            title: {
+                text: 'ingestion failure rate'
+            }
+        },
+
+        xAxis: {
+            title: {
+                text: null
+            },
+            type: 'category'
+        },
+        accessibility: {
+            announceNewData: {
+                enabled: true
+            }
+        },
+        plotOptions: {
+            series: {
+                borderWidth: 0,
+                dataLabels: {
+                    enabled: true,
+                    format: '{point.y:.1f}%'
+                }
+            }
+        },
+
+        series: [
+            {
+                name: 'Medicines',
+                colorByPoint: true,
+                data: {{{ ingestionFailureData }}}
+            }
+        ]
+    });
+
+</script>
+
+</html>
