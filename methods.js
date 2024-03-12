@@ -111,32 +111,45 @@ const getSessionIntakesForMedicationIds = async (medicationIds) => {
 
 
 const getIngestionChartData = async (req, res) => {
-    const session_intakes = await SessionIntake.findAll();
-    var dict_session_intakes = {};
-    session_intakes.map(intake => {
-        if (dict_session_intakes[intake.medication_id] === undefined) {
-            dict_session_intakes[intake.medication_id] = [(intake.end_time - intake.start_time) / 1000, 1];
-        } else {
-            dict_session_intakes[intake.medication_id][0] += (intake.end_time - intake.start_time) / 1000;
-            dict_session_intakes[intake.medication_id][1] += 1;
-        }
-    })
-    var final_array = [];
-    for (let key in dict_session_intakes) {
-        const medication = await getMedicationById(key);
-        final_array.push(
-            {
-                name: medication.brand_name,
-                y: dict_session_intakes[key][0] / dict_session_intakes[key][1]
+    try {
+        const session_intakes = await SessionIntake.findAll();
+        var dict_session_intakes = {};
+        session_intakes.map(intake => {
+            if (dict_session_intakes[intake.medication_id] === undefined) {
+                dict_session_intakes[intake.medication_id] = [(intake.end_time - intake.start_time) / 1000, 1];
+            } else {
+                dict_session_intakes[intake.medication_id][0] += (intake.end_time - intake.start_time) / 1000;
+                dict_session_intakes[intake.medication_id][1] += 1;
             }
-        )
+        })
+        var final_array = [];
+        for (let key in dict_session_intakes) {
+            const medication = await getMedicationById(key);
+            if (medication) { // Check if medication exists
+                final_array.push({
+                    name: medication.brand_name,
+                    y: dict_session_intakes[key][0] / dict_session_intakes[key][1]
+                });
+            }
+        }
+        return final_array;
+    } catch (error) {
+        console.error('Error in getIngestionChartData:', error);
+        throw error;
     }
-    return final_array;
 }
 
+
 const getFilterMedicationData = (medicationDetails) => {
-    return medicationDetails.filter(medication => medication.box !== undefined && medication.quantity !== undefined).sort((a, b) => parseInt(a.box) - parseInt(b.box));;
-}
+    try {
+        return medicationDetails.filter(medication => medication.box !== undefined && medication.quantity !== undefined)
+            .sort((a, b) => parseInt(a.box) - parseInt(b.box));
+    } catch (error) {
+        console.error('Error in getFilterMedicationData:', error);
+        throw error;
+    }
+};
+
 
 const convertDayToNumber = (dayName) => {
     const dayMap = {
@@ -789,34 +802,42 @@ const getAlarmResponseTime = async (id) => {
 };
 
 const getMedicationFailureRate = async (id) => {
-    const session_intakes = await SessionIntake.findAll();
-    var dict_failure_calculation = {};
-    session_intakes.map(intake => {
-        if (dict_failure_calculation[intake.medication_id] === undefined) {
-            if (intake.ingested)
-                dict_failure_calculation[intake.medication_id] = { ingested: 1, notIngested: 0, total: 1 };
-            else
-                dict_failure_calculation[intake.medication_id] = { ingested: 0, notIngested: 1, total: 1 }
-        } else {
-            if (intake.ingested)
-                dict_failure_calculation[intake.medication_id].ingested += 1;
-            else
-                dict_failure_calculation[intake.medication_id].notIngested += 1;
-            dict_failure_calculation[intake.medication_id].total += 1;
-        }
-    })
-    var final_array = [];
-    for (let key in dict_failure_calculation) {
-        const medicationDetails = await getMedicationById(key);
-        final_array.push(
-            {
-                name: medicationDetails.brand_name,
-                y: dict_failure_calculation[key].notIngested === 0 ? 0 : (dict_failure_calculation[key].notIngested / dict_failure_calculation[key].total) * 100
+    try {
+        const session_intakes = await SessionIntake.findAll();
+        var dict_failure_calculation = {};
+        session_intakes.map(intake => {
+            if (dict_failure_calculation[intake.medication_id] === undefined) {
+                if (intake.ingested)
+                    dict_failure_calculation[intake.medication_id] = { ingested: 1, notIngested: 0, total: 1 };
+                else
+                    dict_failure_calculation[intake.medication_id] = { ingested: 0, notIngested: 1, total: 1 }
+            } else {
+                if (intake.ingested)
+                    dict_failure_calculation[intake.medication_id].ingested += 1;
+                else
+                    dict_failure_calculation[intake.medication_id].notIngested += 1;
+                dict_failure_calculation[intake.medication_id].total += 1;
             }
-        )
+        })
+        var final_array = [];
+        for (let key in dict_failure_calculation) {
+            const medicationDetails = await getMedicationById(key);
+            if (medicationDetails) { // Check if medication exists
+                final_array.push(
+                    {
+                        name: medicationDetails.brand_name,
+                        y: dict_failure_calculation[key].notIngested === 0 ? 0 : (dict_failure_calculation[key].notIngested / dict_failure_calculation[key].total) * 100
+                    }
+                );
+            }
+        }
+        return final_array;
+    } catch (error) {
+        console.error('Error in getMedicationFailureRate:', error);
+        throw error;
     }
-    return final_array;
 };
+
 
 module.exports = {
     profile,
