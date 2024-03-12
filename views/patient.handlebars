@@ -25,16 +25,16 @@
         <div class="profile">
             <div class="image">
                 <img src="./images/logo.jpg" width="120" height="120" alt="profile_picture" />
+            </div>
+            <div class="details patientInfo">
+                <div class="item">
+                    <label>Patient Name:</label>
+                    <div class="value">{{patient.first_name}} {{patient.last_name}}</div>
                 </div>
-                <div class="details patientInfo">
-                    <div class="item">
-                        <label>Patient Name:</label>
-                        <div class="value">{{patient.first_name}} {{patient.last_name}}</div>
-                    </div>
-                    <div class="item">
-                        <label>Date Of Birth</label>
-                        <div class="value">{{formatDate patient.dob}}</div>
-                    </div>
+                <div class="item">
+                    <label>Date Of Birth</label>
+                    <div class="value">{{formatDate patient.dob}}</div>
+                </div>
                 <div class="item">
                     <label>Phone</label>
                     <div class="value">{{patient.phone}}</div>
@@ -43,35 +43,35 @@
                     <label>Email</label>
                     <div class="value">{{patient.email}}</div>
                 </div>
-                </div>
-                </div>
-                <div class="menu">
-                    <div class="menu_option" id="option_1">Summary</div>
-                    <div class="menu_option" id="option_2">Care Team</div>
-                    <div class="menu_option" id="option_3">Medications</div>
-                    <div class="menu_option" id="option_4">Medication Schedule</div>
-                    <div class="menu_option" id="option_5">Analytics</div>
             </div>
-            <div class="summary">
-                <div id="care_team">
-                    <div class="section_label">Caretaker</div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Caretaker</th>
-                                <th>Email</th>
-                                <th>profile</th>
-                            </tr>
-                        </thead>
-                        <tbody class="careteamInfo">
-                            <tr>
-                                <td>{{careTaker.first_name}} {{careTaker.last_name}}</td>
-                                <td>{{careTaker.email}}</td>
-                                <td><a href="/profile/{{careTaker.id}}">view</a></td>
-                            </tr>
-                        </tbody>
-                        </table>
-                        </div>
+        </div>
+        <div class="menu">
+            <div class="menu_option" id="option_1">Summary</div>
+            <div class="menu_option" id="option_2">Care Team</div>
+            <div class="menu_option" id="option_3">Medications</div>
+            <div class="menu_option" id="option_4">Medication Schedule</div>
+            <div class="menu_option" id="option_5">Analytics</div>
+        </div>
+        <div class="summary">
+            <div id="care_team">
+                <div class="section_label">Caretaker</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Caretaker</th>
+                            <th>Email</th>
+                            <th>profile</th>
+                        </tr>
+                    </thead>
+                    <tbody class="careteamInfo">
+                        <tr>
+                            <td>{{careTaker.first_name}} {{careTaker.last_name}}</td>
+                            <td>{{careTaker.email}}</td>
+                            <td><a href="/profile/{{careTaker.id}}">view</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <div id="medications">
                 <div class="section_label">Medications</div>
                 <table>
@@ -83,23 +83,23 @@
                             <th>Brand Name</th>
                             <th>Generic Name</th>
                         </tr>
-                        </thead>
-                        <tbody class="medicationInfo">
-                            {{#each medicationData}}
-                            <tr>
+                    </thead>
+                    <tbody class="medicationInfo">
+                        {{#each medicationData}}
+                        <tr>
                             <td>{{this.ndc}}</td>
                             <td>{{this.box}}</td>
                             <td>{{this.quantity}}</td>
                             <td>{{this.brand_name}}</td>
                             <td>{{this.generic_name}}</td>
-                            </tr>
-                            {{/each}}
+                        </tr>
+                        {{/each}}
 
                     </tbody>
-                    </table>
-                    </div>
-                    <div id="schedule">
-                        <div class="section_label">Medication Schedule</div>
+                </table>
+            </div>
+            <div id="schedule">
+                <div class="section_label">Medication Schedule</div>
                 <div class="tabsList_days">
                     <div class="tab" id="day_0">Sunday</div>
                     <div class="tab" id="day_1">Monday</div>
@@ -117,9 +117,9 @@
                                 <th>Generic Name</th>
                                 <th>Time to Take</th>
                                 <th>Taken?</th>
-                                </tr>
-                                </thead>
-                        
+                            </tr>
+                        </thead>
+
                         <tbody class="schedule_div" id="day_0_schedules">
                             {{#each schedules}}
                             {{#ifEquals this.day '0'}}
@@ -128,61 +128,61 @@
                                 <td>{{this.Medication.generic_name}}</td>
                                 <td>{{this.time}}</td>
                                 <td>{{this.ingested}}</td>
-                                </tr>
+                            </tr>
                             {{/ifEquals}}
                             {{/each}}
-                            </tbody>
-                            <tbody class="schedule_div" id="day_1_schedules">
-                                {{#each schedules}}
-                                {{#ifEquals this.day '1'}}
-                                <tr>
-                                <td>{{this.Medication.brand_name}}</td>
-                                <td>{{this.Medication.generic_name}}</td>
-                                <td>{{this.time}}</td>
-                                <td>{{this.ingested}}</td>
-                                </tr>
-                            {{/ifEquals}}
-                            {{/each}}
-                            </tbody>
-                            <tbody class="schedule_div" id="day_2_schedules">
-                                {{#each schedules}}
-                                {{#ifEquals this.day '2'}}
+                        </tbody>
+                        <tbody class="schedule_div" id="day_1_schedules">
+                            {{#each schedules}}
+                            {{#ifEquals this.day '1'}}
                             <tr>
                                 <td>{{this.Medication.brand_name}}</td>
                                 <td>{{this.Medication.generic_name}}</td>
                                 <td>{{this.time}}</td>
                                 <td>{{this.ingested}}</td>
-                                </tr>
+                            </tr>
                             {{/ifEquals}}
                             {{/each}}
-                            </tbody>
-                            <tbody class="schedule_div" id="day_3_schedules">
-                                {{#each schedules}}
-                                {{#ifEquals this.day '3'}}
+                        </tbody>
+                        <tbody class="schedule_div" id="day_2_schedules">
+                            {{#each schedules}}
+                            {{#ifEquals this.day '2'}}
                             <tr>
                                 <td>{{this.Medication.brand_name}}</td>
                                 <td>{{this.Medication.generic_name}}</td>
                                 <td>{{this.time}}</td>
                                 <td>{{this.ingested}}</td>
-                                </tr>
+                            </tr>
                             {{/ifEquals}}
                             {{/each}}
-                            </tbody>
-                            <tbody class="schedule_div" id="day_4_schedules">
-                                {{#each schedules}}
-                                {{#ifEquals this.day '4'}}
+                        </tbody>
+                        <tbody class="schedule_div" id="day_3_schedules">
+                            {{#each schedules}}
+                            {{#ifEquals this.day '3'}}
                             <tr>
                                 <td>{{this.Medication.brand_name}}</td>
                                 <td>{{this.Medication.generic_name}}</td>
                                 <td>{{this.time}}</td>
                                 <td>{{this.ingested}}</td>
-                                </tr>
+                            </tr>
                             {{/ifEquals}}
                             {{/each}}
-                            </tbody>
-                            <tbody class="schedule_div" id="day_5_schedules">
-                                {{#each schedules}}
-                                {{#ifEquals this.day '5'}}
+                        </tbody>
+                        <tbody class="schedule_div" id="day_4_schedules">
+                            {{#each schedules}}
+                            {{#ifEquals this.day '4'}}
+                            <tr>
+                                <td>{{this.Medication.brand_name}}</td>
+                                <td>{{this.Medication.generic_name}}</td>
+                                <td>{{this.time}}</td>
+                                <td>{{this.ingested}}</td>
+                            </tr>
+                            {{/ifEquals}}
+                            {{/each}}
+                        </tbody>
+                        <tbody class="schedule_div" id="day_5_schedules">
+                            {{#each schedules}}
+                            {{#ifEquals this.day '5'}}
                             <tr>
                                 <td>{{this.Medication.brand_name}}</td>
                                 <td>{{this.Medication.generic_name}}</td>
@@ -190,42 +190,42 @@
                                 <td>
                                     {{this.ingested}}
                                 </td>
-                                </tr>
+                            </tr>
                             {{/ifEquals}}
                             {{/each}}
-                            </tbody>
-                            <tbody class="schedule_div" id="day_6_schedules">
-                                {{#each schedules}}
-                                {{#ifEquals this.day '6'}}
+                        </tbody>
+                        <tbody class="schedule_div" id="day_6_schedules">
+                            {{#each schedules}}
+                            {{#ifEquals this.day '6'}}
                             <tr>
                                 <td>{{this.Medication.brand_name}}</td>
                                 <td>{{this.Medication.generic_name}}</td>
                                 <td>{{this.time}}</td>
                                 <td>{{this.ingested}}</td>
-                                </tr>
+                            </tr>
                             {{/ifEquals}}
                             {{/each}}
-                            </tbody>
+                        </tbody>
                     </table>
-                    </div>
-                    </div>
-                    
-                    <div id="analytics">
-                        <div class="section_label">Analytics</div>
-                        <div id="chart1" style="margin:20px 0 60px 0;"></div>
-                        <div id="chart2" style="margin: 60px 0 60px 0;"></div>
-                        <div id="chart3" style="margin: 60px 0 0 0;"></div>
-                    </div>
-                    </div>
-                    </div>
+                </div>
+            </div>
+
+            <div id="analytics">
+                <div class="section_label">Analytics</div>
+                <div id="chart1" style="margin:20px 0 60px 0;"></div>
+                <div id="chart2" style="margin: 60px 0 60px 0;"></div>
+                <div id="chart3" style="margin: 60px 0 0 0;"></div>
+            </div>
+        </div>
+    </div>
 </body>
 
 <script>
     $(document).ready(function () {
-         
-        
+
+
         function handleData() {
-            
+
             $('#day_0').css("background-color", "#555");
             $('#day_1').css("background-color", "#555");
             $('#day_2').css("background-color", "#555");
@@ -235,7 +235,7 @@
             $('#day_6').css("background-color", "#555");
 
             $(`.schedule_div`).hide();
-            
+
         }
         $(`.schedule_div`).hide();
         $('#day_1_schedules').show();
@@ -333,7 +333,7 @@
 
     Highcharts.chart('chart1', {
         chart: {
-            type: 'line',
+            type: 'column',
         },
         title: {
             text: "Ingestion time per medication",
@@ -376,7 +376,7 @@
             type: 'pie',
         },
         title: {
-            text: "Alarm response time",
+            text: "Alarm response time of each day in a Month",
         },
         legend: {
             enabled: false,
@@ -417,7 +417,7 @@
                 }, {
                     enabled: true,
                     distance: -40,
-                    format: '{point.y:.1f} sec',
+                    format: '{point.y} min',
                     style: {
                         textOutline: 'none',
                     },
@@ -427,7 +427,7 @@
 
         series: [
             {
-                name: 'Medicines',
+                name: 'Response Time',
                 colorByPoint: true,
                 data: {{{ sessionDetails }}}
             }
