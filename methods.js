@@ -6,6 +6,7 @@ const _ = require('lodash'); // Lodash makes grouping easier
 
 const nodemailer = require('nodemailer');
 const Handlebars = require('handlebars');
+const { INTEGER } = require('sequelize');
 
 Handlebars.registerHelper('ifEquals', function (arg1, arg2, options) {
     return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
@@ -89,7 +90,6 @@ const getMedicationSchedules = async (patientId) => {
                 },
             ]
         });
-
         return schedules.map(schedule => schedule.toJSON());
     } catch (err) {
         console.error('Error fetching medication schedules', err);
@@ -207,13 +207,13 @@ const patient = async (req, res) => {
                 return displayValue;
             });
 
-            console.log("Schedules with ingestion:", schedulesWithIngestion);
+            // console.log("Schedules with ingestion:", schedulesWithIngestion);
             const ingestionChartData = await getIngestionChartData(patientDetails.id);
             const sessionDetails = await getAlarmResponseTime(patientDetails.id);
             const ingestionFailureData = await getMedicationFailureRate(patientDetails.id);
             const filterMedicationData = getFilterMedicationData(medicationDetails);
 
-            console.log("scheduleDetails =>", scheduleDetails);
+            // console.log("scheduleDetails =>", scheduleDetails);
             return res.render('patient', {
                 patient: patientDetails,
                 careTaker: caretakerDetails,
@@ -759,41 +759,65 @@ const getAlarmResponseTime = async (id) => {
         const sessions = await Session.findAll({
             where: { patient_id: id },
         });
-
-        const dict_session_details = {};
-        sessions.map(session => {
-            if (dict_session_details[session.id] === undefined) {
-                dict_session_details[session.id] = (session.end_time - session.start_time) / 1000;
+        var calAlarmTime_dict = {};
+        sessions.map(sessions => {
+            const estDate = sessions.start_time;
+            const date = new Date(estDate).getUTCDay();
+            const diffTime = (sessions.start_time - sessions.alarm_time) / 1000;
+            if (calAlarmTime_dict[date] === undefined) {
+                calAlarmTime_dict[date] = [[estDate], diffTime, 1];
+            } else {
+                calAlarmTime_dict[date][0].push(estDate);
+                calAlarmTime_dict[date][1] += diffTime;
+                calAlarmTime_dict[date][2] += 1;
             }
-        });
-
-        const final_dict = {};
-        const session_intakes = await SessionIntake.findAll();
-        for (let key in dict_session_details) {
-            const res = session_intakes.filter(intake => intake.session_id === key);
-            if (res.length > 0) {
-                const medicationId = res[0].medication_id;
-                if (medicationId) { // Check if medication_id exists
-                    if (final_dict[medicationId] === undefined) {
-                        final_dict[medicationId] = [dict_session_details[key], 1];
-                    } else {
-                        final_dict[medicationId][0] += dict_session_details[key];
-                        final_dict[medicationId][1] += 1;
-                    }
+        })
+        // console.log(calAlarmTime_dict)
+        var final_array = [];
+        const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        for (var key in calAlarmTime_dict) {
+            final_array.push(
+                {
+                    name: dayNames[new Date(calAlarmTime_dict[key][0][0]).getUTCDay()],
+                    y: Math.ceil(parseFloat(String(Math.floor((calAlarmTime_dict[key][1] / calAlarmTime_dict[key][2]) / 60)) + "." + String(Math.floor((calAlarmTime_dict[key][1] / calAlarmTime_dict[key][2]) % 60))))
                 }
-            }
+            )
         }
+        console.log(final_array)
+        // const dict_session_details = {};
+        // sessions.map(session => {
+        //     if (dict_session_details[session.id] === undefined) {
+        //         dict_session_details[session.id] = (session.end_time - session.start_time) / 1000;
+        //     }
+        // });
 
-        const final_array = [];
-        for (let key in final_dict) {
-            const medicationDetails = await getMedicationById(key);
-            if (medicationDetails) {
-                final_array.push({
-                    name: medicationDetails.brand_name,
-                    y: final_dict[key][0] / final_dict[key][1]
-                });
-            }
-        }
+        // const final_dict = {};
+        // const session_intakes = await SessionIntake.findAll();
+        // for (let key in dict_session_details) {
+        //     const res = session_intakes.filter(intake => intake.session_id === key);
+        //     if (res.length > 0) {
+        //         const medicationId = res[0].medication_id;
+        //         if (medicationId) { // Check if medication_id exists
+        //             if (final_dict[medicationId] === undefined) {
+        //                 final_dict[medicationId] = [dict_session_details[key], 1];
+        //             } else {
+        //                 final_dict[medicationId][0] += dict_session_details[key];
+        //                 final_dict[medicationId][1] += 1;
+        //             }
+        //         }
+        //     }
+        // }
+
+        // const final_array = [];
+        // for (let key in final_dict) {
+        //     const medicationDetails = await getMedicationById(key);
+        //     if (medicationDetails) {
+        //         final_array.push({
+        //             name: medicationDetails.brand_name,
+        //             y: final_dict[key][0] / final_dict[key][1]
+        //         });
+        //     }
+        // }
         return final_array;
     } catch (error) {
         console.error('Error calculating alarm response time:', error);
