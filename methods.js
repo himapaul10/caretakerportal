@@ -10,45 +10,6 @@ const Handlebars = require('handlebars');
 Handlebars.registerHelper('ifEquals', function (arg1, arg2, options) {
     return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
 });
-const getPatientMedicationSchedulesWithIngestion = async (patientId) => {
-    try {
-        // Find the patient by ID and include the associated medication schedules and session intakes
-        const patient = await Patient.findOne({
-            where: { id: patientId },
-            include: [
-                {
-                    model: Schedule,
-                    include: [
-                        {
-                            model: SessionIntake,
-                            required: false // Include session intakes even if not present
-                        }
-                    ]
-                }
-            ]
-        });
-
-        // Extract medication schedules with ingestion status
-        if (patient) {
-            // Iterate over schedules to get ingestion status
-            const schedulesWithIngestion = patient.Schedules.map(schedule => {
-                const { SessionIntakes } = schedule;
-                const ingested = SessionIntakes && SessionIntakes.length > 0 ? SessionIntakes[0].ingested : false;
-                return {
-                    ...schedule.toJSON(),
-                    ingested: ingested
-                };
-            });
-
-            return schedulesWithIngestion;
-        } else {
-            throw new Error('Patient not found.');
-        }
-    } catch (error) {
-        console.error('Error fetching patient medication schedules with ingestion status:', error);
-        throw error;
-    }
-};
 
 
 // Portal Endpoints
@@ -124,17 +85,30 @@ const getMedicationSchedules = async (patientId) => {
                     model: Medication
                 },
                 {
-                    model: SessionIntake
+                    model: SessionIntake // Include session intakes
                 },
             ]
         });
-        schedules.map(schedule => console.log(schedule.toJSON()))
+
         return schedules.map(schedule => schedule.toJSON());
     } catch (err) {
         console.error('Error fetching medication schedules', err);
         throw err;
     }
 };
+
+const getSessionIntakesForMedicationIds = async (medicationIds) => {
+    try {
+        const sessionIntakes = await SessionIntake.findAll({
+            where: { medication_id: medicationIds }
+        });
+        return sessionIntakes.map(intake => intake.toJSON());
+    } catch (error) {
+        console.error('Error fetching session intakes for medication IDs:', error);
+        throw error;
+    }
+};
+
 
 const getIngestionChartData = async (req, res) => {
     const session_intakes = await SessionIntake.findAll();
@@ -190,8 +164,37 @@ const patient = async (req, res) => {
         try {
             const patientDetails = await getPatient(req.query.id);
             const caretakerDetails = await getCaretaker(patientDetails.caretaker_id);
-            const medicationDetails = await getMedicationsWithDetails(patientDetails.id); // Function to get medications with details like NDC, box, etc.
-            const scheduleDetails = await getMedicationSchedules(patientDetails.id); // Function to get medication schedules
+            const medicationDetails = await getMedicationsWithDetails(patientDetails.id);
+            const scheduleDetails = await getMedicationSchedules(patientDetails.id);
+            const medicationIds = scheduleDetails.map(schedule => schedule.medication_id);
+
+            // Fetch session intakes for medication IDs
+            const sessionIntakes = await getSessionIntakesForMedicationIds(medicationIds);
+
+            // Combine session intakes with schedule details
+            const schedulesWithIngestion = scheduleDetails.map(schedule => {
+                const sessionIntake = sessionIntakes.find(intake => intake.medication_id === schedule.medication_id && isIngestedOnDay(intake, schedule));
+                const ingested = sessionIntake ? sessionIntake.ingested : null; // Get ingested value or null if not found for the day
+                return {
+                    ...schedule,
+                    ingested: ingested // Assign ingested value
+                };
+            });
+
+            // Rendering logic for session intake value
+            const sessionIntakeDisplay = schedulesWithIngestion.map(schedule => {
+                const ingested = schedule.ingested;
+                let displayValue = '';
+                if (ingested === 1) {
+                    displayValue = 'true';
+                } else if (ingested === 0) {
+                    displayValue = 'false';
+                }
+                // If ingested is null or undefined, displayValue remains blank
+                return displayValue;
+            });
+
+            console.log("Schedules with ingestion:", schedulesWithIngestion);
             const ingestionChartData = await getIngestionChartData(patientDetails.id);
             const sessionDetails = await getAlarmResponseTime(patientDetails.id);
             const ingestionFailureData = await getMedicationFailureRate(patientDetails.id);
@@ -202,7 +205,8 @@ const patient = async (req, res) => {
                 patient: patientDetails,
                 careTaker: caretakerDetails,
                 medicationData: filterMedicationData,
-                schedules: scheduleDetails,
+                schedules: schedulesWithIngestion, // Use schedulesWithIngestion instead of scheduleDetails
+                sessionIntake: sessionIntakeDisplay, // Rendered session intake display values
                 sessionDetails: JSON.stringify(sessionDetails),
                 ingestionChartData: JSON.stringify(ingestionChartData),
                 ingestionFailureData: JSON.stringify(ingestionFailureData)
@@ -214,6 +218,15 @@ const patient = async (req, res) => {
         res.redirect('/login');
     }
 }
+
+// Helper function to check if session intake occurred on the same day as the schedule
+const isIngestedOnDay = (sessionIntake, schedule) => {
+    // Extracting the day from the session intake start time
+    const intakeDay = new Date(sessionIntake.start_time).getDay();
+    return intakeDay === schedule.day;
+};
+
+
 
 // API Endpoints
 
@@ -729,39 +742,52 @@ const getIngestionTime = async (id) => {
 // };
 
 const getAlarmResponseTime = async (id) => {
-    const sessions = await Session.findAll({
-        where: { patient_id: id },
-    })
-    var dict_session_details = {}
-    sessions.map(session => {
-        if (dict_session_details[session.id] === undefined) {
-            dict_session_details[session.id] = (session.end_time - session.start_time) / 1000;
-        }
-    });
+    try {
+        const sessions = await Session.findAll({
+            where: { patient_id: id },
+        });
 
-    var final_dict = {};
-    const session_intakes = await SessionIntake.findAll();
-    for (let key in dict_session_details) {
-        const res = session_intakes.filter(intake => intake.session_id === key);
-        if (final_dict[res[0].medication_id] === undefined) {
-            final_dict[res[0].medication_id] = [dict_session_details[key], 1];
-        } else {
-            final_dict[res[0].medication_id][0] += dict_session_details[key];
-            final_dict[res[0].medication_id][1] += 1;
-        }
-    }
-    var final_array = [];
-    for (let key in final_dict) {
-        const medicationDetails = await getMedicationById(key);
-        final_array.push(
-            {
-                name: medicationDetails.brand_name,
-                y: final_dict[key][0] / final_dict[key][1]
+        const dict_session_details = {};
+        sessions.map(session => {
+            if (dict_session_details[session.id] === undefined) {
+                dict_session_details[session.id] = (session.end_time - session.start_time) / 1000;
             }
-        )
+        });
+
+        const final_dict = {};
+        const session_intakes = await SessionIntake.findAll();
+        for (let key in dict_session_details) {
+            const res = session_intakes.filter(intake => intake.session_id === key);
+            if (res.length > 0) {
+                const medicationId = res[0].medication_id;
+                if (medicationId) { // Check if medication_id exists
+                    if (final_dict[medicationId] === undefined) {
+                        final_dict[medicationId] = [dict_session_details[key], 1];
+                    } else {
+                        final_dict[medicationId][0] += dict_session_details[key];
+                        final_dict[medicationId][1] += 1;
+                    }
+                }
+            }
+        }
+
+        const final_array = [];
+        for (let key in final_dict) {
+            const medicationDetails = await getMedicationById(key);
+            if (medicationDetails) {
+                final_array.push({
+                    name: medicationDetails.brand_name,
+                    y: final_dict[key][0] / final_dict[key][1]
+                });
+            }
+        }
+        return final_array;
+    } catch (error) {
+        console.error('Error calculating alarm response time:', error);
+        throw error;
     }
-    return final_array;
 };
+
 const getMedicationFailureRate = async (id) => {
     const session_intakes = await SessionIntake.findAll();
     var dict_failure_calculation = {};

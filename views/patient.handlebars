@@ -116,8 +116,7 @@
                                 <th>Brand Name</th>
                                 <th>Generic Name</th>
                                 <th>Time to Take</th>
-                                <th>Day</th>
-                                <th>Taken Today</th>
+                                <th>Taken?</th>
                                 </tr>
                                 </thead>
                         
@@ -128,8 +127,7 @@
                                 <td>{{this.Medication.brand_name}}</td>
                                 <td>{{this.Medication.generic_name}}</td>
                                 <td>{{this.time}}</td>
-                                <td>{{this.day}}</td>
-                                <td>{{#if this.ingested}} Yes {{else}} No {{/if}}</td>
+                                <td>{{this.ingested}}</td>
                                 </tr>
                             {{/ifEquals}}
                             {{/each}}
@@ -141,8 +139,7 @@
                                 <td>{{this.Medication.brand_name}}</td>
                                 <td>{{this.Medication.generic_name}}</td>
                                 <td>{{this.time}}</td>
-                                <td>{{this.day}}</td>
-                                <td>{{#if this.ingested}} Yes {{else}} No {{/if}}</td>
+                                <td>{{this.ingested}}</td>
                                 </tr>
                             {{/ifEquals}}
                             {{/each}}
@@ -154,8 +151,7 @@
                                 <td>{{this.Medication.brand_name}}</td>
                                 <td>{{this.Medication.generic_name}}</td>
                                 <td>{{this.time}}</td>
-                                <td>{{this.day}}</td>
-                                <td>{{#if this.ingested}} Yes {{else}} No {{/if}}</td>
+                                <td>{{this.ingested}}</td>
                                 </tr>
                             {{/ifEquals}}
                             {{/each}}
@@ -167,8 +163,7 @@
                                 <td>{{this.Medication.brand_name}}</td>
                                 <td>{{this.Medication.generic_name}}</td>
                                 <td>{{this.time}}</td>
-                                <td>{{this.day}}</td>
-                                <td>{{#if this.ingested}} Yes {{else}} No {{/if}}</td>
+                                <td>{{this.ingested}}</td>
                                 </tr>
                             {{/ifEquals}}
                             {{/each}}
@@ -180,8 +175,7 @@
                                 <td>{{this.Medication.brand_name}}</td>
                                 <td>{{this.Medication.generic_name}}</td>
                                 <td>{{this.time}}</td>
-                                <td>{{this.day}}</td>
-                                <td>{{#if this.ingested}} Yes {{else}} No {{/if}}</td>
+                                <td>{{this.ingested}}</td>
                                 </tr>
                             {{/ifEquals}}
                             {{/each}}
@@ -193,9 +187,8 @@
                                 <td>{{this.Medication.brand_name}}</td>
                                 <td>{{this.Medication.generic_name}}</td>
                                 <td>{{this.time}}</td>
-                                <td>{{this.day}}</td>
                                 <td>
-                                    {{#if this.ingested}} Yes {{else}} No {{/if}}
+                                    {{this.ingested}}
                                 </td>
                                 </tr>
                             {{/ifEquals}}
@@ -208,8 +201,7 @@
                                 <td>{{this.Medication.brand_name}}</td>
                                 <td>{{this.Medication.generic_name}}</td>
                                 <td>{{this.time}}</td>
-                                <td>{{this.day}}</td>
-                                <td>{{#if this.ingested}} Yes {{else}} No {{/if}}</td>
+                                <td>{{this.ingested}}</td>
                                 </tr>
                             {{/ifEquals}}
                             {{/each}}
@@ -230,6 +222,7 @@
 
 <script>
     $(document).ready(function () {
+         
         
         function handleData() {
             
