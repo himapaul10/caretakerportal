@@ -10,6 +10,13 @@ const sequelize = new Sequelize({
     logging: false
 });
 
+// Set session time zone
+sequelize.query("SET time_zone = 'America/New_York'").then(() => {
+    console.log("Session time zone set successfully");
+}).catch(error => {
+    console.error("Error setting session time zone:", error);
+});
+
 console.log("Initializing Models...");
 
 const initPatient = require('./models/Patient');
